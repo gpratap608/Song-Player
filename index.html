@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <input type="text" id="SEARCHELEMENT" placeholder="Search Song">
+    <button onclick="searchSONG()"> Search </button>
+    <img src="" id="coverImage" alt="">
+    <button onclick="playButton()" id="PlayButton">Play</button>    
+    <button onclick="playMusic()" id="playable">Play</button>
+    <button onclick="pauseMusic()" id="pauseButton"> Pause </button>
+    <script>
+        document.getElementById("playable").style.display = "none"
+        document.getElementById("PlayButton").style.display = "none"
+        document.getElementById("pauseButton").style.display = "none"
+        let songId = ""
+        let coverImage = ""
+        let audio = ""
+        async function searchSONG(){
+            if(audio !== ""){
+                audio.pause()
+            }
+            const songName = document.getElementById("SEARCHELEMENT").value
+            const url = `https://spotify23.p.rapidapi.com/search/?q=${songName}&type=tracks&offset=0&limit=10&numberOfTopResults=5`;
+                const options = {
+                    method: 'GET',
+                    headers: {
+                        'x-rapidapi-key': '0886c79e8emsh6e498fc495a9241p1c7e5djsn9134e7aeb883',
+                        'x-rapidapi-host': 'spotify23.p.rapidapi.com'
+                    }
+                };
+
+                try {
+                    const response = await fetch(url, options);
+                    const result = await response.json();
+                    console.log(result.tracks.items[0].data.id);
+                    songId = result.tracks.items[0].data.id
+                    coverImage = result.tracks.items[0].data.albumOfTrack.coverArt.sources[0].url
+                    document.getElementById("coverImage").src = coverImage
+                    document.getElementById("PlayButton").style.display = "block"
+                    document.getElementById("playable").style.display = "none"
+                    document.getElementById("pauseButton").style.display = "none"
+                } catch (error) {
+                    console.error(error);
+}
+        }
+
+        async function playButton(){
+            const url = `https://spotify23.p.rapidapi.com/tracks/?ids=${songId}`;
+            const options = {
+                method: 'GET',
+                headers: {
+                    'x-rapidapi-key': '0886c79e8emsh6e498fc495a9241p1c7e5djsn9134e7aeb883',
+                    'x-rapidapi-host': 'spotify23.p.rapidapi.com'
+                }
+            };
+
+            try {
+                const response = await fetch(url, options);
+                const result = await response.json();
+                console.log(result);
+                console.log(result.tracks[0].preview_url);
+                audio = new Audio(result.tracks[0].preview_url)
+                audio.play()
+                document.getElementById("PlayButton").style.display = "none"
+                document.getElementById("playable").style.display = "none"
+                document.getElementById("pauseButton").style.display = "block"
+
+            } catch (error) {
+                console.error(error);
+            }
+        }
+
+        async function pauseMusic(){
+            audio.pause()
+            document.getElementById("PlayButton").style.display = "none"
+            document.getElementById("playable").style.display = "block"
+            document.getElementById("pauseButton").style.display = "none"
+
+        }
+        async function playMusic(){
+            audio.play()
+            document.getElementById("PlayButton").style.display = "none"
+            document.getElementById("playable").style.display = "none"
+            document.getElementById("pauseButton").style.display = "block"
+
+        }
+    </script>
+</body>
+</html>
